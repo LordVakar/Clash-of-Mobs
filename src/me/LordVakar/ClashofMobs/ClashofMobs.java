@@ -8,6 +8,7 @@ import java.util.Map;
 
 import me.LordVakar.ClashofMobs.API.EconomyAPICore;
 import me.LordVakar.ClashofMobs.Listeners.JoinListener;
+import me.LordVakar.ClashofMobs.Troops.Archer;
 import me.LordVakar.ClashofMobs.Troops.Barbarian;
 import net.minecraft.server.v1_7_R3.BiomeBase;
 import net.minecraft.server.v1_7_R3.BiomeMeta;
@@ -37,7 +38,8 @@ public class ClashofMobs extends JavaPlugin
 				);
 		ClashofMobs.economyapi = new EconomyAPICore();
 		//GameManager.getManager().loadArenas();
-		registerEntity("Zombie", 54, EntityZombie.class, Barbarian.class);
+		registerEntity("Barbarian", 54, Barbarian.class);
+		registerEntity("Archer", 51, Archer.class);
 	}
 	
 	public void onDisable() {
@@ -73,8 +75,10 @@ public class ClashofMobs extends JavaPlugin
 		return economyapi;
 	}
 	
-	public void registerEntity(String name, int id, Class<? extends EntityInsentient> nmsClass, Class<? extends EntityInsentient> customClass) {
+    @SuppressWarnings("unchecked")
+    public void registerEntity(String name, int id, Class<? extends EntityInsentient> customClass) {
         try {
+ 
             List<Map<?, ?>> dataMaps = new ArrayList<Map<?, ?>>();
             for (Field f : EntityTypes.class.getDeclaredFields()) {
                 if (f.getType().getSimpleName().equals(Map.class.getSimpleName())) {
@@ -82,32 +86,10 @@ public class ClashofMobs extends JavaPlugin
                     dataMaps.add((Map<?, ?>) f.get(null));
                 }
             }
-            if (dataMaps.get(2).containsKey(id)) {
-                dataMaps.get(0).remove(name);
-                dataMaps.get(2).remove(id);
-            }
-            Method method = EntityTypes.class.getDeclaredMethod("a", Class.class, String.class, int.class);
-            method.setAccessible(true);
-            method.invoke(null, customClass, name, id);
-            for (Field f : BiomeBase.class.getDeclaredFields()) {
-                if (f.getType().getSimpleName().equals(BiomeBase.class.getSimpleName())) {
-                    if (f.get(null) != null) {
-                        for (Field list : BiomeBase.class.getDeclaredFields()) {
-                            if (list.getType().getSimpleName().equals(List.class.getSimpleName())) {
-                                list.setAccessible(true);
-                                @SuppressWarnings("unchecked")
-                                List<BiomeMeta> metaList = (List<BiomeMeta>) list.get(f.get(null));
-                                for (BiomeMeta meta : metaList) {
-                                    Field clazz = BiomeMeta.class.getDeclaredFields()[0];
-                                    if (clazz.get(meta).equals(nmsClass)) {
-                                        clazz.set(meta, customClass);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+ 
+            ((Map<Class<? extends EntityInsentient>, String>) dataMaps.get(1)).put(customClass, name);
+            ((Map<Class<? extends EntityInsentient>, Integer>) dataMaps.get(3)).put(customClass, id);
+ 
         } catch (Exception e) {
             e.printStackTrace();
         }

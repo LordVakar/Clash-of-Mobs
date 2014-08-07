@@ -1,0 +1,50 @@
+package me.LordVakar.ClashofMobs.Utils;
+
+import java.util.UUID;
+
+import me.LordVakar.ClashofMobs.ClashofMobs;
+
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
+
+public class Util 
+{
+	private static JavaPlugin plugin = ClashofMobs.getJavaPlugin();
+	
+    public static boolean isPlayer(Object o) {
+        return o instanceof Player;
+    }
+    
+    public static Player getPlayer(Object o) {
+        return (Player) o;
+    }
+    
+    public static Player getPlayer(String s) {
+    	return Bukkit.getPlayer(s);
+    }
+    public static OfflinePlayer getOfflinePlayer(Player player) {
+        return Bukkit.getOfflinePlayer(player.getName());
+    }
+    
+    public static OfflinePlayer getOfflinePlayer(String player) {
+        return Bukkit.getOfflinePlayer(player);
+    }
+    
+    public static Player getPlayerByUuid(UUID uuid) {
+        for(Player p : Bukkit.getServer().getOnlinePlayers())
+            if(p.getUniqueId().equals(uuid)) {
+                return p;
+            }
+		return null;
+    }
+    
+    public static void log(Object o) {
+        getPlugin().getLogger().info(o.toString());
+   	}
+
+	public static JavaPlugin getPlugin() {
+		return plugin;
+	}
+}
